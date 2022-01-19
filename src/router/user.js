@@ -5,7 +5,6 @@ const { SuccessModel, ErrorModel } = require('../model/resModel');
 const getCookieExpires = () => {
     const d = new Date();
     d.setTime(d.getTime() + (24 * 60 * 60 * 1000));
-    console.log(d.toGMTString());
     return d.toGMTString();
 }
 
@@ -23,9 +22,9 @@ const handleUserRouter = (req, res) => {
         return result.then(loginData => {
             if (JSON.stringify(loginData) !== '{}'){
                 
-                // change cookie
-                res.setHeader('Set-Cookie', `username=${loginData.username}; path=/; httpOnly; expires=${getCookieExpires()}`)
-
+                req.session.username = loginData.username;
+                req.session.realname = loginData.realname;
+                console.log(req.session);
                 return new SuccessModel();
             } else {
                 return new ErrorModel('failed to login');
@@ -36,10 +35,10 @@ const handleUserRouter = (req, res) => {
     // authenticate login test
 
     if (method === 'GET' && req.path === '/api/user/login-test'){
-        if (req.cookie.username){
+        if (req.session.username){
             return Promise.resolve(
                 new SuccessModel({
-                    username: req.cookie.username
+                    session: req.session
                 })
             );
         }
@@ -48,4 +47,7 @@ const handleUserRouter = (req, res) => {
 
 }
 
-module.exports = handleUserRouter;
+module.exports = {
+    handleUserRouter,
+    getCookieExpires
+};
