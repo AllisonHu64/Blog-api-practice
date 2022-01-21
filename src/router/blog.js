@@ -6,6 +6,13 @@ const { getList,
 } = require('../controller/blog');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
 
+// login authentication
+const loginCheck = (req) => {
+    if (!req.session.username){
+        return Promise.resolve(new ErrorModel('sorry. Not logged in.'));
+    }
+}
+
 const handleBlogRouter = (req, res) => {
     const method = req.method; // GET POST
     const url = req.url;
@@ -13,8 +20,16 @@ const handleBlogRouter = (req, res) => {
 
     // get blog list
     if (method === 'GET' && path === '/api/blog/list') {
-        const author = req.query.author || '';
+        let author = req.query.author || '';
         const keyword = req.query.keyword || '';
+
+        if (req.query.isadmin){
+            const loginCheckResult = loginCheck(req);
+            if (loginCheckResult) {
+                return loginCheckResult;
+            }
+            author = req.session.username;
+        }
 
         const result = getList(author, keyword);
         return result.then(listData => {
@@ -36,7 +51,12 @@ const handleBlogRouter = (req, res) => {
     // create new blog
     if (method === 'POST' && path === '/api/blog/new') {
         
-        req.body.author = 'zhangsan'; // fake data, turn into reals ones after redis
+        const loginCheckResult = loginCheck(req);
+        if (loginCheckResult) {
+            return loginCheckResult;
+        }
+
+        req.body.author = req.session.username; // fake data, turn into reals ones after redis
         const result = newBlog(req.body);
         return result.then(newBlogData => {
             return new SuccessModel(newBlogData)
@@ -45,8 +65,15 @@ const handleBlogRouter = (req, res) => {
 
     // update blog
     if (method === 'POST' && path === '/api/blog/update') {
+
+        const loginCheckResult = loginCheck(req);
+        if (loginCheckResult) {
+            return loginCheckResult;
+        }
+
         const id = req.query.id || '';
-        const result = updateBlog(id, req.body);
+        const author = req.session.username;
+        const result = updateBlog(id, author, req.body);
         return result.then(isUpdated => {
             if (isUpdated){
                 return new SuccessModel();
@@ -58,8 +85,14 @@ const handleBlogRouter = (req, res) => {
 
     // delete blog
     if (method === 'POST' && path === '/api/blog/delete') {
+
+        const loginCheckResult = loginCheck(req);
+        if (loginCheckResult) {
+            return loginCheckResult;
+        }
+
         const id = req.query.id || '';
-        const author = 'zhangsan' // fake data, will change when change to redis
+        const author = req.session.username;
         const result = deleteBlog(id, author);
 
         return result.then(isDeleted => {

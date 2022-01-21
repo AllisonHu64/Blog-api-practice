@@ -37,12 +37,12 @@ const newBlog = (blogData = {}) => {
     })
 }
 
-const updateBlog = (id, blogData = {}) => {
+const updateBlog = (id, author, blogData = {}) => {
     const title = blogData.title;
     const content = blogData.content;
 
     const sql = `
-    update blogs set content = '${content}', title = '${title}' where id = '${id}'
+    update blogs set content = '${content}', title = '${title}' where id = '${id} and author='${author}'
     `
     return exec(sql).then(updateData => {
         return updateData.affectedRows > 0;

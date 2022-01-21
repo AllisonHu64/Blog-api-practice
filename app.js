@@ -2,10 +2,7 @@ const { rejects } = require('assert');
 const querystring = require('querystring');
 const handleBlogRouter = require('./src/router/blog');
 const { handleUserRouter, getCookieExpires } = require('./src/router/user');
-
-// session Data
-const SESSION_DATA = {};
-
+const { get, set } = require('./src/db/redis');
 
 const getPostData = (req) => {
     const promise = new Promise((resolve, reject) => {
@@ -60,15 +57,17 @@ const serverHandle = async (req, res) => {
     let needSetCookie = false;
     let userId = req.cookie.userid;
     if (userId){
-        if (!SESSION_DATA[userId]){
-            SESSION_DATA[userId] = {};
+        const sessionData = await get(userId);
+        if (!sessionData){
+            await set(userId, {});
         }
     } else {
         needSetCookie = true;
         userId = `${Date.now()}_${Math.random()}`;
-        SESSION_DATA[userId] = {};
+        await set(userId, {});
     }
-    req.session = SESSION_DATA[userId]
+    req.sessionId = userId;
+    req.session = await get(userId);
 
     // handle postdata
     await getPostData(req).then(postData => {

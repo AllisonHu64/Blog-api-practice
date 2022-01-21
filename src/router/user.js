@@ -1,4 +1,5 @@
 const { login } = require('../controller/user');
+const { set } = require('../db/redis');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
 
 // get cookie expiration time
@@ -14,9 +15,8 @@ const handleUserRouter = (req, res) => {
     const path = url.split('?')[0]
 
     // log in 
-    if (method === 'GET' && path === '/api/user/login') {
-        // const { username, password } = req.body;
-        const { username, password } = req.query;
+    if (method === 'POST' && path === '/api/user/login') {
+        const { username, password } = req.body;
         const result = login(username, password);
 
         return result.then(loginData => {
@@ -24,25 +24,13 @@ const handleUserRouter = (req, res) => {
                 
                 req.session.username = loginData.username;
                 req.session.realname = loginData.realname;
-                console.log(req.session);
+
+                set(req.sessionId, req.session);
                 return new SuccessModel();
             } else {
                 return new ErrorModel('failed to login');
             }
         })
-    }
-
-    // authenticate login test
-
-    if (method === 'GET' && req.path === '/api/user/login-test'){
-        if (req.session.username){
-            return Promise.resolve(
-                new SuccessModel({
-                    session: req.session
-                })
-            );
-        }
-        return Promise.resolve(new ErrorModel('sorry. Not logged in.'));
     }
 
 }
