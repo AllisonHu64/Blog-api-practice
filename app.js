@@ -3,9 +3,16 @@ const querystring = require('querystring');
 const handleBlogRouter = require('./src/router/blog');
 const { handleUserRouter, getCookieExpires } = require('./src/router/user');
 const { get, set } = require('./src/db/redis');
+const { access, event, error } = require('./src/utils/log');
+
+
 
 const getPostData = (req) => {
+
     const promise = new Promise((resolve, reject) => {
+        // write access log
+        access(`${req.method} -- ${req.url} -- ${req.headers['user-agent']} -- ${Date.now()}`);
+
         if (req.method !== 'POST'){
             resolve({});
             return;

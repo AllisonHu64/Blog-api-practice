@@ -1,13 +1,16 @@
-const { exec } = require('../db/mysql');
+const { exec, escape } = require('../db/mysql');
+const xss = require('xss');
 
 const getList = (author, keyword) => {
+    author = escape(author);
+    keyword = escape(`%${keyword}%`);
     let sql = `select * from blogs where 1=1 `;
 
     if (author) {
-        sql += `and author='${author}' `;
+        sql += `and author=${author} `;
     }
     if (keyword) {
-        sql += `and title like '%${keyword}%' `;
+        sql += `and title like ${keyword} `;
     }
 
     sql += `order by createtime desc;`
@@ -16,18 +19,22 @@ const getList = (author, keyword) => {
 }
 
 const getDetail = (id) => {
-    const sql = `select * from blogs where id='${id}';`
+    id = escape(id);
+    const sql = `select * from blogs where id=${id};`
     return exec(sql).then(rows => {
         return rows[0]
     })
 }
 
 const newBlog = (blogData = {}) => {
-    const createtime = Date.now();
+    const createtime = escape(Date.now());
+    const title = escape(xss(blogData.title));
+    const content = escape(xss(blogData.content));
+    const author = escape(blogData.author);
 
     const sql = `
     insert into blogs (title, content, createtime, author)
-    values ('${blogData.title}', '${blogData.content}', '${createtime}', '${blogData.author}');
+    values (${title}, ${content}, ${createtime}, ${author});
     `
     
     return exec(sql).then(insertData => {
@@ -38,11 +45,13 @@ const newBlog = (blogData = {}) => {
 }
 
 const updateBlog = (id, author, blogData = {}) => {
-    const title = blogData.title;
-    const content = blogData.content;
+    const title = escape(xss(blogData.title));
+    const content = escape(xss(blogData.content));
+    id = escape(id);
+    author = escape(author);
 
     const sql = `
-    update blogs set content = '${content}', title = '${title}' where id = '${id} and author='${author}'
+    update blogs set content = ${content}, title = ${title} where id = ${id} and author=${author}
     `
     return exec(sql).then(updateData => {
         return updateData.affectedRows > 0;
@@ -50,7 +59,10 @@ const updateBlog = (id, author, blogData = {}) => {
 }
 
 const deleteBlog = (id, author) => {
-    const sql = `delete from blogs where id='${id}' and author='${author}'`
+    id = escape(id);
+    author = escape(author);
+
+    const sql = `delete from blogs where id=${id} and author=${author}`
     return exec(sql).then(deleteData => {
         return deleteData.affectedRows > 0;
     });
