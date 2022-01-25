@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>管理中心</title>
+    <title>Admin Page</title>
     <style type="text/css">
         body {
             margin: 0 20px;
@@ -29,27 +29,27 @@
 <body>
     <h1 style="border-bottom: 1px solid #ccc; padding-bottom: 10px;">管理中心</h1>
     <p>
-        <a href="/new.html">新建博客</a>
+        <a href="/new.html">New Blog</a>
     </p>
     <div style="margin-bottom: 10px;">
         <input id="text-keyword">
-        <button id="btn-search">搜索</button>
+        <button id="btn-search">Search</button>
     </div>
     <table id="table-container">
         <tr>
-            <th>博客标题</th>
-            <th colspan="2">操作</th>
+            <th>Blog Title</th>
+            <th colspan="2">Operation</th>
         </tr>
     </table>
 
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
     <script>
-        // 发送 get 请求
+        // send get request
         function get(url) {
             return $.get(url)
         }
 
-        // 发送 post 请求
+        // send post request
         function post(url, data = {}) {
             return $.ajax({
                 type: 'post',
@@ -59,7 +59,7 @@
             })
         }
 
-        // 获取 url 参数
+        // get url parameters
         function getUrlParams() {
             let paramStr = location.href.split('?')[1] || ''
             paramStr = paramStr.split('#')[0]
@@ -73,22 +73,22 @@
             return result
         }
 
-        // 获取 dom 元素
+        // get DOM elements
         const $textKeyword = $('#text-keyword')
         const $btnSearch = $('#btn-search')
         const $tableContainer = $('#table-container')
 
-        // 拼接接口 url
+        // combine url
         let url = '/api/blog/list?isadmin=1'  // 增加一个 isadmin=1 参数，使用登录者的用户名，后端也需要修改 ！！！
         const urlParams = getUrlParams()
         if (urlParams.keyword) {
             url += '&keyword=' + urlParams.keyword
         }
 
-        // 加载数据
+        // render data
         get(url).then(res => {
             if (res.errno !== 0) {
-                alert('数据错误')
+                alert('Error. Can not retrieve blog list.')
                 return
             }
 
@@ -101,10 +101,10 @@
                             <a href="/detail.html?id=${item.id || item._id}" target="_blank">${item.title}</a>
                         </td>
                         <td>
-                            <a href="/edit.html?id=${item.id || item._id}">编辑</a>
+                            <a href="/edit.html?id=${item.id || item._id}">Edit</a>
                         </td>
                         <td>
-                            <a data-id="${item.id || item._id}" class="item-del">删除</a>
+                            <a data-id="${item.id || item._id}" class="item-del">Delete</a>
                         </td>
                     </tr>
                 `))

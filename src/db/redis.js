@@ -10,7 +10,7 @@ async function set(key, val) {
     if (typeof val === 'object'){
         val = JSON.stringify(val);
     }
-    await redisClient.set(key, val).then(
+    await redisClient.set(key, val, 'ex', 60 * 60 * 24).then(
         (res) =>{
             console.log(`result for setting ${key}: ${res}`);
         }

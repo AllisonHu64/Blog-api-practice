@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>编辑博客</title>
+    <title>Edit Blog</title>
     <style type="text/css">
         body {
             margin: 0 20px;
@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-    <h1 style="border-bottom: 1px solid #ccc; padding-bottom: 10px;">编辑博客</h1>
+    <h1 style="border-bottom: 1px solid #ccc; padding-bottom: 10px;">Edit Blog</h1>
     <div>
         <div class="title-wrapper">
             <input id="text-title">
@@ -35,18 +35,18 @@
             <textarea id="text-content"></textarea>
         </div>
         <div>
-            <button id="btn-update">保存</button>
+            <button id="btn-update">Save</button>
         </div>
     </div>
 
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
     <script>
-        // 发送 get 请求
+        // Send get request
         function get(url) {
             return $.get(url)
         }
 
-        // 发送 post 请求
+        // Send post request
         function post(url, data = {}) {
             return $.ajax({
                 type: 'post',
@@ -56,7 +56,7 @@
             })
         }
 
-        // 获取 url 参数
+        // get url parameters
         function getUrlParams() {
             let paramStr = location.href.split('?')[1] || ''
             paramStr = paramStr.split('#')[0]
@@ -70,12 +70,12 @@
             return result
         }
 
-        // 获取 dom 元素
+        // get DOM elements
         const $textTitle = $('#text-title')
         const $textContent = $('#text-content')
         const $btnUpdate = $('#btn-update')
 
-        // 获取博客内容
+        // retrive blog detail
         const urlParams = getUrlParams()
         const url = '/api/blog/detail?id=' + urlParams.id
         get(url).then(res => {
@@ -84,14 +84,14 @@
                 return
             }
 
-            // 显示数据
+            // show blog detail
             const data = res.data || {}
             $textTitle.val(data.title)
             $textContent.val(data.content)
             $btnUpdate.attr('data-id', data.id || data._id)
         })
 
-        // 提交修改内容
+        // Submit edited value
         $btnUpdate.click(function () {
             const $this = $(this)
             const id = $this.attr('data-id')
@@ -105,10 +105,10 @@
             }
             post(url, data).then(res => {
                 if (res.errno !== 0) {
-                    alert('操作错误')
+                    alert('Failed to edit blog detail.')
                     return
                 }
-                alert('更新成功')
+                alert('Successfully updated')
                 location.href = '/admin.html'
             })
         })

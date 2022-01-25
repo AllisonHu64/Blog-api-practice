@@ -41,7 +41,7 @@
 
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
     <script>
-        // 发送 post 请求
+        // send post request
         function post(url, data = {}) {
             return $.ajax({
                 type: 'post',
@@ -51,17 +51,17 @@
             })
         }
 
-        // 获取 dom 元素
+        // get dom elements
         $textTitle = $('#text-title')
         $textContent = $('#text-content')
         $btnCreate = $('#btn-create')
 
-        // 提交数据
+        // submit data
         $btnCreate.click(() => {
             const title = $textTitle.val().trim()
             const content = $textContent.val().trim()
             if (title === '' || content === '') {
-                alert('标题或内容不能为空')
+                alert('title and content can not be empty')
                 return
             }
 
@@ -72,10 +72,10 @@
             }
             post(url, data).then(res => {
                 if (res.errno !== 0) {
-                    alert('操作错误')
+                    alert('Faild to create a new blog.')
                     return
                 }
-                alert('创建成功')
+                alert('Successfully created a new blog')
                 location.href = '/admin.html'
             })
         })

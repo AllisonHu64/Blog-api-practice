@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>首页</title>
+    <title>Main Page</title>
     <style type="text/css">
         body {
             margin: 0 20px;
@@ -31,24 +31,24 @@
     </style>
 </head>
 <body>
-    <h1>博客首页</h1>
+    <h1>Blog Main Page</h1>
     <div id="blog-container"></div>
 
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
     <script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
     <script src="https://cdn.bootcss.com/moment.js/2.23.0/locale/zh-cn.js"></script>
     <script>
-        // 发送 get 请求
+        // Send get request
         function get(url) {
             return $.get(url)
         }
 
-        // 显示格式化的时间
+        // Format time
         function getFormatDate(dt) {
             return moment(dt).format('LLL')
         }
 
-        // 获取 url 参数
+        // get url parameters
         function getUrlParams() {
             let paramStr = location.href.split('?')[1] || ''
             paramStr = paramStr.split('#')[0]
@@ -62,24 +62,24 @@
             return result
         }
 
-        // 获取 dom 元素
+        // Get DOM elements
         const $container = $('#blog-container')
 
-        // 拼接接口 url
+        // concat api url
         let url = '/api/blog/list'
         const urlParams = getUrlParams()
         if (urlParams.author) {
             url += '?author=' + urlParams.author
         }
 
-        // 加载数据
+        // render blog list
         get(url).then((res) => {
             if (res.errno !== 0) {
                 alert('数据错误')
                 return
             }
 
-            // 遍历博客列表，并显示
+            // loop through each blog，add
             const data = res.data || []
             data.forEach(item => {
                 $container.append($(`
