@@ -1,5 +1,5 @@
 const { login } = require('../controller/user');
-const { set } = require('../db/redis');
+const { set, del } = require('../db/redis');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
 
 // get cookie expiration time
@@ -31,6 +31,26 @@ const handleUserRouter = (req, res) => {
                 return new ErrorModel('failed to login');
             }
         })
+    }
+
+    // log out 
+    if (method === 'POST' && path === '/api/user/logout') {
+        if (!req.session.username){
+            return Promise.resolve(new ErrorModel('sorry. Not logged in.'));
+        }
+
+        del(req.sessionId);
+        res.setHeader('Set-Cookie', `userid=; path=/; httpOnly;`)
+        return Promise.resolve(new SuccessModel())
+    }
+
+    // log in check
+    if (method === 'POST' && path === '/api/user/loginCheck') {
+        // check if loggied in
+        if (!req.session.username){
+            return Promise.resolve(new ErrorModel('sorry. Not logged in.'));
+        }
+        return Promise.resolve(new SuccessModel());
     }
 
 }

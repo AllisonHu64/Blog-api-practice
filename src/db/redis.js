@@ -12,11 +12,14 @@ async function set(key, val) {
     }
     await redisClient.set(key, val, 'ex', 60 * 60 * 24).then(
         (res) =>{
-            console.log(`result for setting ${key}: ${res}`);
+            // console.log(`result for setting ${key}: ${res}`);
         }
     );
 }
 
+async function del(key) {
+    await redisClient.del(key);
+}
 async function get(key) {
     const value = await redisClient.get(key)
     if (value == null){
@@ -32,5 +35,6 @@ async function get(key) {
 
 module.exports = {
     set,
-    get
+    get,
+    del
 }

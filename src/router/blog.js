@@ -41,10 +41,15 @@ const handleBlogRouter = (req, res) => {
     // blog detail 
     if (method === 'GET' && path === '/api/blog/detail') {
         const id = req.query.id || '';
+        const author = req.session.username;
+        const isAdmin = req.query.isadmin || false;
        
-        const result = getDetail(id);
+        const result = getDetail(id, author, isAdmin);
         return result.then(detailData => {
-            return new SuccessModel(detailData)
+            if (detailData){
+                return new SuccessModel(detailData);
+            }
+            return new ErrorModel('failed to retrieve blog detail');
         })
     }
 

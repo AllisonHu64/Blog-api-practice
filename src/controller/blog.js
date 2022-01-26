@@ -6,21 +6,23 @@ const getList = (author, keyword) => {
     keyword = escape(`%${keyword}%`);
     let sql = `select * from blogs where 1=1 `;
 
-    if (author) {
+    if (author!=="''") {
         sql += `and author=${author} `;
     }
-    if (keyword) {
+    if (keyword!=="'%%'") {
         sql += `and title like ${keyword} `;
     }
-
-    sql += `order by createtime desc;`
 
     return exec(sql);
 }
 
-const getDetail = (id) => {
+const getDetail = (id, author="", isAdmin=false) => {
+    author = escape(author);
     id = escape(id);
-    const sql = `select * from blogs where id=${id};`
+    let sql = `select * from blogs where id=${id}`
+    if (isAdmin){
+        sql += `and author=${author}`;
+    }
     return exec(sql).then(rows => {
         return rows[0]
     })
@@ -36,7 +38,7 @@ const newBlog = (blogData = {}) => {
     insert into blogs (title, content, createtime, author)
     values (${title}, ${content}, ${createtime}, ${author});
     `
-    
+
     return exec(sql).then(insertData => {
         return {
             id : insertData.insertId
